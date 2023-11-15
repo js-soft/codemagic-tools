@@ -10,8 +10,12 @@
   "license": "MIT",
   "author": "j&s-soft GmbH",
   "main": "index.js",
+  "bin": {
+    "jscm": "dist/index.js"
+  },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "start": "ts-node src/index.ts"
   },
   "dependencies": {
     "axios": "^1.6.2",
