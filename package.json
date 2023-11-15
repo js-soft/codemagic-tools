@@ -6,10 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/js-soft/codemagic-tools.git"
-  },
+  "repository": "github:js-soft/codemagic-tools",
   "author": "j&s-soft GmbH",
   "license": "MIT",
   "bugs": {
