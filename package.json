@@ -15,6 +15,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "build:watch": "tsc -w",
     "start": "ts-node src/index.ts"
   },
   "dependencies": {
