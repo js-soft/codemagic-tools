@@ -4,7 +4,7 @@
   "description": "Codemagic extended tooling",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "repository": "github:js-soft/codemagic-tools",
   "author": "j&s-soft GmbH",
