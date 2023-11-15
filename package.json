@@ -1,0 +1,27 @@
+{
+  "name": "@js-soft/codemagic-tools",
+  "version": "1.0.0",
+  "description": "Codemagic extended tooling",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/js-soft/codemagic-tools.git"
+  },
+  "author": "j&s-soft GmbH",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/js-soft/codemagic-tools/issues"
+  },
+  "homepage": "https://github.com/js-soft/codemagic-tools#readme",
+  "dependencies": {
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}
