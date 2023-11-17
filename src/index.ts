@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import yargs from "yargs"
-import { TeamsMessaging } from "./teams/TeamsMessaging"
+import { TeamsMessaging } from "./commands/TeamsMessaging"
 
 const args = require("yargs")
   .usage("jscm command")
