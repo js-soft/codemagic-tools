@@ -16,7 +16,10 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc -w",
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/index.ts",
+    "lint": "npm run lint:prettier && npm run lint:eslint",
+    "lint:eslint": "eslint --ext ts ./src",
+    "lint:prettier": "prettier --check ."
   },
   "files":[
     "dist"
@@ -26,6 +29,8 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
+    "@js-soft/eslint-config-ts": "^1.6.4",
+    "@js-soft/license-check": "^1.0.6",
     "@types/node": "^20.9.0",
     "@types/yargs": "^17.0.31",
     "prettier": "^3.1.0",
