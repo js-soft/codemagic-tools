@@ -35,24 +35,26 @@ export class TeamsMessaging {
   }
 
   public defineCommandLineOptions(args: any): any {
-    return args.option({
-      webhook: {
-        description: "the webhook of the teams channel, that should receive the message",
-        required: true,
-        type: "string"
-      },
-      platform: {
-        description: "identifier of the platform for which the build was created [ios/android]",
-        required: true,
-        type: "string"
-      },
-      artifactUrl: {
-        description: "download link for the generated artifact (logs or build)",
-        required: true,
-        type: "string"
-      },
-      wasBuildSuccessful: { description: "status of the finished build", required: true, type: "boolean" }
-    })
+    return args
+      .option({
+        webhook: {
+          description: "the webhook of the teams channel, that should receive the message",
+          required: true,
+          type: "string"
+        },
+        platform: {
+          description: "identifier of the platform for which the build was created",
+          required: true,
+          type: "string"
+        },
+        artifactUrl: {
+          description: "download link for the generated artifact (logs or build)",
+          required: true,
+          type: "string"
+        },
+        wasBuildSuccessful: { description: "status of the finished build", required: true, type: "boolean" }
+      })
+      .choices("platform", ["ios", "android"])
   }
 
   private isSanityCheckUrlsOk(urls: string[]): boolean {
