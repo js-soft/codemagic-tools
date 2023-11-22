@@ -13,7 +13,7 @@ async function run() {
       await teamsMessagingCommand.run(options)
       return options
     })
-    // To-Do: work on description string
+    // TODO: work on description string
     .command("email", "This command is used to send a email", async (args) => {
       const emailMessagingCommand = new EmailMessaging()
       const options = await emailMessagingCommand.parseCLIOptions(args)

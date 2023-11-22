@@ -47,7 +47,7 @@ export class TeamsMessaging {
   public parseCLIOptions(argv: yargs.Argv<{}>): TeamsMessagingOptions | Promise<TeamsMessagingOptions> {
     return argv
       .option("platform", {
-        description: "identifier of the platform for which the build was created",
+        description: "identifier of the platform for which the build was triggered",
         required: true,
         type: "string",
         choices: ["ios", "android"]

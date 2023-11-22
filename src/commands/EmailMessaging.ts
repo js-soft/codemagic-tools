@@ -39,7 +39,7 @@ export class EmailMessaging {
   }
 
   public sendEmail(messageContents: any):Promise<boolean>{
-    // To-Do: work on proper 
+    // TODO: work on proper 
     console.log(messageContents)
     return Promise.resolve(true);
   }
@@ -47,7 +47,7 @@ export class EmailMessaging {
   public parseCLIOptions(argv: yargs.Argv<{}>): EmailMessagingOptions | Promise<EmailMessagingOptions> {
     return argv
       .option("platform", {
-        description: "identifier of the platform for which the build was created",
+        description: "identifier of the platform for which the build was triggered",
         required: true,
         type: "string",
         choices: ["ios", "android"]
