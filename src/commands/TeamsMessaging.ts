@@ -3,28 +3,27 @@ import axios from "axios"
 export class TeamsMessaging {
   public async main(
     webhook: string,
-    platformIdent: string,
+    platformIdentifier: string,
     artifactLink: string,
     isSuccessful: boolean
   ): Promise<boolean> {
     if (!this.isSanityCheckUrlsOk([webhook, artifactLink])) {
-      console.log("ERROR: A given Url is not a valid url.")
+      console.log("ERROR: A given Url is not valid.")
       return false
     }
 
-    let statusIdentifier = "Successful"
-    if (!isSuccessful) {
-      statusIdentifier = "Failed"
-    }
+    const statusIdentifier = isSuccessful ? "Successful" : "Failed"
 
     const messageContents = {
-      title: `New ${statusIdentifier.toUpperCase()} codemagic build - ${platformIdent.toUpperCase()}`,
-      summary: `${statusIdentifier.toUpperCase()} build - ${platformIdent.toUpperCase()}`,
-      text: this.getTextTeamsMsg(isSuccessful),
+      title: `New ${statusIdentifier.toUpperCase()} codemagic build - ${platformIdentifier.toUpperCase()}`,
+      summary: `${statusIdentifier.toUpperCase()} build - ${platformIdentifier.toUpperCase()}`,
+      text: isSuccessful
+        ? "The newly released version did build and is now available as an artifact."
+        : "A problem occurred while building the newly released version. The corresponding logs are available.",
       potentialAction: [
         {
           "@type": "OpenUri",
-          name: "Download Artifact",
+          name: isSuccessful ? "Download Build" : "Download Logs",
           targets: [{ os: "default", uri: artifactLink }]
         }
       ]
@@ -68,13 +67,5 @@ export class TeamsMessaging {
       }
     }
     return true
-  }
-
-  private getTextTeamsMsg(isSuccessful: boolean) {
-    if (isSuccessful) {
-      return "The newly released version did build and is now available as an artifact."
-    }
-
-    return "The newly released version did NOT build and the logs now available as an artifact."
   }
 }
