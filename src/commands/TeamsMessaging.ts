@@ -1,13 +1,18 @@
 import axios from "axios"
 
 export class TeamsMessaging {
-  async main(webhook: string, platformIdent: string, artifactLink: string, isSuccessful: boolean) {
+  public async main(
+    webhook: string,
+    platformIdent: string,
+    artifactLink: string,
+    isSuccessful: boolean
+  ): Promise<boolean> {
     if (!this.isSanityCheckUrlsOk([webhook, artifactLink])) {
       console.log("ERROR: A given Url is not a valid url.")
-      return
+      return false
     }
 
-    var statusIdentifier = "Successful"
+    let statusIdentifier = "Successful"
     if (!isSuccessful) {
       statusIdentifier = "Failed"
     }
@@ -26,10 +31,11 @@ export class TeamsMessaging {
     }
 
     await axios.post(webhook, messageContents)
-    return
+
+    return true
   }
 
-  public defineCommandLineOptions(args: any) {
+  public defineCommandLineOptions(args: any): any {
     return args.option({
       webhook: {
         description: "the webhook of the teams channel, that should receive the message",
@@ -51,8 +57,9 @@ export class TeamsMessaging {
   }
 
   private isSanityCheckUrlsOk(urls: string[]): boolean {
-    for (var urlToCheck of urls) {
+    for (const urlToCheck of urls) {
       try {
+        // eslint-disable-next-line no-new
         new URL(urlToCheck)
       } catch (err) {
         console.log(err)
@@ -66,8 +73,8 @@ export class TeamsMessaging {
   private getTextTeamsMsg(isSuccessful: boolean) {
     if (isSuccessful) {
       return "The newly released version did build and is now available as an artifact."
-    } else {
-      return "The newly released version did NOT build and the logs now available as an artifact."
     }
+
+    return "The newly released version did NOT build and the logs now available as an artifact."
   }
 }
