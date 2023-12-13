@@ -37,7 +37,7 @@ export class TeamsMessaging {
       } - ${platformIdentifier}`,
       summary: `${options.projectName}: ${statusIdentifier} build ${options.buildNumber} - ${platformIdentifier}`,
       text: options.wasBuildSuccessful
-        ? `Build ${options.buildNumber}: The newly released version did build and is now available as an artifact.`
+        ? `Build ${options.buildNumber}: The latest version did build and is now available as an artifact.`
         : `Build ${options.buildNumber}: A problem occurred while building the newly released version. The corresponding logs are available.`,
       potentialAction: [
         {
