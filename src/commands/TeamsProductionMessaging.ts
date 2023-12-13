@@ -1,7 +1,7 @@
 import axios from "axios"
 import yargs from "yargs"
 
-export interface TeamsMessagingPublishOptions {
+export interface TeamsProductionMessagingOptions {
   projectName: string
   platform: string
   buildUrl: string
@@ -9,8 +9,8 @@ export interface TeamsMessagingPublishOptions {
   webhook: string
 }
 
-export class TeamsMessagingPublish {
-  public async run(options: TeamsMessagingPublishOptions): Promise<void> {
+export class TeamsProductionMessaging {
+  public async run(options: TeamsProductionMessagingOptions): Promise<void> {
     if (!this.isUrlValid(options.webhook)) {
       console.error("The given webhook is not valid.")
       process.exit(1)
@@ -43,7 +43,7 @@ export class TeamsMessagingPublish {
     })
   }
 
-  public parseCLIOptions(argv: yargs.Argv<{}>): TeamsMessagingPublishOptions | Promise<TeamsMessagingPublishOptions> {
+  public parseCLIOptions(argv: yargs.Argv<{}>): TeamsProductionMessagingOptions | Promise<TeamsProductionMessagingOptions> {
     return argv
       .option("projectName", {
         description: "Name of the project",
