@@ -2,13 +2,13 @@ import axios from "axios"
 import yargs from "yargs"
 
 export interface TeamsMessagingOptions {
-  webhook: string
-  platform: string
-  artifactUrl: string
-  wasBuildSuccessful: boolean
-  buildNumber: number
-  buildUrl: string
   appName: string
+  platform: string
+  buildUrl: string
+  buildNumber: number
+  wasBuildSuccessful: boolean
+  artifactUrl: string
+  webhook: string  
 }
 
 export class TeamsMessaging {
@@ -70,18 +70,8 @@ export class TeamsMessaging {
         type: "string",
         choices: ["ios", "android"]
       })
-      .option("artifactUrl", {
-        description: "download link for the generated artifact (logs or build)",
-        required: true,
-        type: "string"
-      })
-      .option("wasBuildSuccessful", {
-        description: "status of the finished build",
-        required: true,
-        type: "boolean"
-      })
-      .option("webhook", {
-        description: "the webhook of the teams channel, that should receive the message",
+      .option("buildUrl", {
+        description: "a link to the build page",
         required: true,
         type: "string"
       })
@@ -90,8 +80,18 @@ export class TeamsMessaging {
         required: true,
         type: "number"
       })
-      .option("buildUrl", {
-        description: "a link to the build page",
+      .option("wasBuildSuccessful", {
+        description: "status of the finished build",
+        required: true,
+        type: "boolean"
+      })
+      .option("artifactUrl", {
+        description: "download link for the generated artifact (logs or build)",
+        required: true,
+        type: "string"
+      })
+      .option("webhook", {
+        description: "the webhook of the teams channel, that should receive the message",
         required: true,
         type: "string"
       }).argv
