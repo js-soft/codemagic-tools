@@ -6,7 +6,6 @@ export interface TeamsMessagingPublishOptions {
   platform: string
   buildUrl: string
   buildNumber: number
-  artifactUrl: string
   webhook: string
 }
 
@@ -14,11 +13,6 @@ export class TeamsMessagingPublish {
   public async run(options: TeamsMessagingPublishOptions): Promise<void> {
     if (!this.isUrlValid(options.webhook)) {
       console.error("The given webhook is not valid.")
-      process.exit(1)
-    }
-
-    if (!this.isUrlValid(options.artifactUrl)) {
-      console.error("The given artifactUrl is not valid.")
       process.exit(1)
     }
 
@@ -37,13 +31,8 @@ export class TeamsMessagingPublish {
       potentialAction: [
         {
           "@type": "OpenUri",
-          name: "Download new Version",
-          targets: [{ os: "default", uri: options.artifactUrl }]
-        },
-        {
-          "@type": "OpenUri",
           name: "Open Build",
-          targets: [{ os: "default", uri: options.artifactUrl }]
+          targets: [{ os: "default", uri: options.buildUrl }]
         }
       ]
     }
@@ -76,11 +65,6 @@ export class TeamsMessagingPublish {
         description: "the number of the run build",
         required: true,
         type: "number"
-      })
-      .option("artifactUrl", {
-        description: "download link for the generated artifact (logs or build)",
-        required: true,
-        type: "string"
       })
       .option("webhook", {
         description: "the webhook of the teams channel, that should receive the message",
