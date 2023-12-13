@@ -71,7 +71,7 @@ export class TeamsMessaging {
         choices: ["ios", "android"]
       })
       .option("buildUrl", {
-        description: "a link to the build page",
+        description: "link to the build process",
         required: true,
         type: "string"
       })

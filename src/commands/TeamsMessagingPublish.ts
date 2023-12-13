@@ -22,6 +22,11 @@ export class TeamsMessagingPublish {
       process.exit(1)
     }
 
+    if (!this.isUrlValid(options.buildUrl)) {
+      console.error("The given buildUrl is not valid.")
+      process.exit(1)
+    }
+
     const platformIdentifier = options.platform.toUpperCase()
     const storeName = platformIdentifier === "IOS" ? "App Store" : "Google Play Store"
     const messageContents = {
