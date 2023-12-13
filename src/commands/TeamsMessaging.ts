@@ -6,6 +6,9 @@ export interface TeamsMessagingOptions {
   platform: string
   artifactUrl: string
   wasBuildSuccessful: boolean
+  buildNumber: number
+  buildUrl: string
+  appName: string
 }
 
 export class TeamsMessaging {
@@ -20,20 +23,30 @@ export class TeamsMessaging {
       process.exit(1)
     }
 
+    if (!this.isUrlValid(options.buildUrl)) {
+      console.error("The given buildUrl is not valid.")
+      process.exit(1)
+    }
+
     const statusIdentifier = options.wasBuildSuccessful ? "Successful" : "Failed"
     const platformIdentifier = options.platform.toUpperCase()
 
     const messageContents = {
-      title: `New ${statusIdentifier.toLocaleLowerCase()} codemagic build - ${platformIdentifier}`,
-      summary: `${statusIdentifier} build - ${platformIdentifier}`,
+      title: `${options.appName}: New ${statusIdentifier.toLocaleLowerCase()} build ${options.buildNumber} - ${platformIdentifier}`,
+      summary: `${options.appName}: ${statusIdentifier} build ${options.buildNumber} - ${platformIdentifier}`,
       text: options.wasBuildSuccessful
-        ? "The newly released version did build and is now available as an artifact."
-        : "A problem occurred while building the newly released version. The corresponding logs are available.",
+        ? `Build ${options.buildNumber}: The newly released version did build and is now available as an artifact.`
+        : `Build ${options.buildNumber}: A problem occurred while building the newly released version. The corresponding logs are available.`,
       potentialAction: [
         {
           "@type": "OpenUri",
-          name: options.wasBuildSuccessful ? "Download Build" : "Read Logs",
+          name: options.wasBuildSuccessful ? `Download ${options.platform}-App` : "Open Logs",
           targets: [{ os: "default", uri: options.artifactUrl }]
+        },
+        {
+          "@type": "OpenUri",
+          name: "Open Build",
+          targets: [{ os: "default", uri: options.buildUrl }]
         }
       ]
     }
@@ -46,6 +59,11 @@ export class TeamsMessaging {
 
   public parseCLIOptions(argv: yargs.Argv<{}>): TeamsMessagingOptions | Promise<TeamsMessagingOptions> {
     return argv
+      .option("appName", {
+        description: "name of the App",
+        required: true,
+        type: "string"
+      })
       .option("platform", {
         description: "identifier of the platform for which the build was created",
         required: true,
@@ -64,6 +82,16 @@ export class TeamsMessaging {
       })
       .option("webhook", {
         description: "the webhook of the teams channel, that should receive the message",
+        required: true,
+        type: "string"
+      })
+      .option("buildNumber", {
+        description: "the number of the run build",
+        required: true,
+        type: "number"
+      })
+      .option("buildUrl", {
+        description: "a link to the build page",
         required: true,
         type: "string"
       }).argv
