@@ -2,13 +2,13 @@ import axios from "axios"
 import yargs from "yargs"
 
 export interface TeamsMessagingOptions {
-  appName: string
+  projectName: string
   platform: string
   buildUrl: string
   buildNumber: number
   wasBuildSuccessful: boolean
   artifactUrl: string
-  webhook: string  
+  webhook: string
 }
 
 export class TeamsMessaging {
@@ -32,8 +32,10 @@ export class TeamsMessaging {
     const platformIdentifier = options.platform.toUpperCase()
 
     const messageContents = {
-      title: `${options.appName}: New ${statusIdentifier.toLocaleLowerCase()} build ${options.buildNumber} - ${platformIdentifier}`,
-      summary: `${options.appName}: ${statusIdentifier} build ${options.buildNumber} - ${platformIdentifier}`,
+      title: `${options.projectName}: New ${statusIdentifier.toLocaleLowerCase()} build ${
+        options.buildNumber
+      } - ${platformIdentifier}`,
+      summary: `${options.projectName}: ${statusIdentifier} build ${options.buildNumber} - ${platformIdentifier}`,
       text: options.wasBuildSuccessful
         ? `Build ${options.buildNumber}: The newly released version did build and is now available as an artifact.`
         : `Build ${options.buildNumber}: A problem occurred while building the newly released version. The corresponding logs are available.`,
@@ -59,8 +61,8 @@ export class TeamsMessaging {
 
   public parseCLIOptions(argv: yargs.Argv<{}>): TeamsMessagingOptions | Promise<TeamsMessagingOptions> {
     return argv
-      .option("appName", {
-        description: "name of the App",
+      .option("projectName", {
+        description: "name of the Project",
         required: true,
         type: "string"
       })
