@@ -2,13 +2,20 @@
 
 import yargs from "yargs"
 import { TeamsMessaging } from "./commands/TeamsMessaging"
+import { TeamsMessagingPublish } from "./commands/TeamsMessagingPublish"
 
 async function run() {
   await yargs(process.argv.slice(2))
-    .command("teams", "This command is used to send a teams message via a passed webhook", async (args) => {
+    .command("teams-build", "After Codemagic Build: MS Teams message about new build", async (args) => {
       const teamsMessagingCommand = new TeamsMessaging()
       const options = await teamsMessagingCommand.parseCLIOptions(args)
       await teamsMessagingCommand.run(options)
+      return options
+    })
+    .command("teams-publish", "After Codemagic Publish: MS Teams message about new release", async (args) => {
+      const teamsMessagePublish = new TeamsMessagingPublish()
+      const options = await teamsMessagePublish.parseCLIOptions(args)
+      await teamsMessagePublish.run(options)
       return options
     })
     .demand(1, "Must provide a valid command from the ones listed above.")
