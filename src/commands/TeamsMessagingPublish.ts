@@ -2,10 +2,12 @@ import axios from "axios"
 import yargs from "yargs"
 
 export interface TeamsMessagingPublishOptions {
-  webhook: string
+  projectName: string
   platform: string
+  buildUrl: string
+  buildNumber: number
   artifactUrl: string
-  wasBuildSuccessful: boolean
+  webhook: string
 }
 
 export class TeamsMessagingPublish {
@@ -20,19 +22,22 @@ export class TeamsMessagingPublish {
       process.exit(1)
     }
 
-    const statusIdentifier = options.wasBuildSuccessful ? "Successful" : "Failed"
     const platformIdentifier = options.platform.toUpperCase()
-
+    const storeName = platformIdentifier === "IOS" ? "App Store" : "Google Play Store"
     const messageContents = {
-      title: `New ${statusIdentifier.toLocaleLowerCase()} codemagic build - ${platformIdentifier}`,
-      summary: `${statusIdentifier} build - ${platformIdentifier}`,
-      text: options.wasBuildSuccessful
-        ? "The newly released version did build and is now available as an artifact."
-        : "A problem occurred while building the newly released version. The corresponding logs are available.",
+      title: `${options.projectName}: New release is no available in the ${storeName} [${platformIdentifier}]`,
+      summary: `New Release - ${platformIdentifier}`,
+      text: `New Release ${options.buildNumber} - ${platformIdentifier} <br/> 
+      The newly released version is now available in the ${storeName} or can alternatively be directly downloaded below.<br/> `,
       potentialAction: [
         {
           "@type": "OpenUri",
-          name: options.wasBuildSuccessful ? "Download Build" : "Read Logs",
+          name: "Download new Version",
+          targets: [{ os: "default", uri: options.artifactUrl }]
+        },
+        {
+          "@type": "OpenUri",
+          name: "Open Build",
           targets: [{ os: "default", uri: options.artifactUrl }]
         }
       ]
@@ -46,21 +51,31 @@ export class TeamsMessagingPublish {
 
   public parseCLIOptions(argv: yargs.Argv<{}>): TeamsMessagingPublishOptions | Promise<TeamsMessagingPublishOptions> {
     return argv
+      .option("projectName",{
+        description: "Name of the project",
+        required: true,
+        type: "string",
+      })
       .option("platform", {
         description: "identifier of the platform for which the build was created",
         required: true,
         type: "string",
         choices: ["ios", "android"]
       })
+      .option("buildUrl", {
+        description: "a link to the build page",
+        required: true,
+        type: "string"
+      })
+      .option("buildNumber", {
+        description: "the number of the run build",
+        required: true,
+        type: "number"
+      })
       .option("artifactUrl", {
         description: "download link for the generated artifact (logs or build)",
         required: true,
         type: "string"
-      })
-      .option("wasBuildSuccessful", {
-        description: "status of the finished build",
-        required: true,
-        type: "boolean"
       })
       .option("webhook", {
         description: "the webhook of the teams channel, that should receive the message",

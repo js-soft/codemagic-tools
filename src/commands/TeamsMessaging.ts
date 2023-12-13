@@ -32,10 +32,8 @@ export class TeamsMessaging {
     const platformIdentifier = options.platform.toUpperCase()
 
     const messageContents = {
-      title: `${options.projectName}: New ${statusIdentifier.toLocaleLowerCase()} build ${
-        options.buildNumber
-      } - ${platformIdentifier}`,
-      summary: `${options.projectName}: ${statusIdentifier} build ${options.buildNumber} - ${platformIdentifier}`,
+      title: `${options.projectName}: New ${statusIdentifier.toLocaleLowerCase()} build - ${platformIdentifier}`,
+      summary: `${options.projectName}: ${statusIdentifier} build - ${platformIdentifier}`,
       text: options.wasBuildSuccessful
         ? `Build ${options.buildNumber}: The latest version did build and is now available as an artifact.`
         : `Build ${options.buildNumber}: A problem occurred while building the newly released version. The corresponding logs are available.`,
