@@ -7,7 +7,7 @@ import { TeamsMessagingPublish } from "./commands/TeamsMessagingPublish"
 async function run() {
   await yargs(process.argv.slice(2))
     .command(
-      "teams-build",
+      "teams-develop",
       "After Codemagic Build: Send MS-Teams message informing about the new build",
       async (args) => {
         const teamsMessagingCommand = new TeamsMessaging()
@@ -17,7 +17,7 @@ async function run() {
       }
     )
     .command(
-      "teams-publish",
+      "teams-production",
       "After Codemagic Publish: Send MS-Teams message informing about the new release",
       async (args) => {
         const teamsMessagePublish = new TeamsMessagingPublish()
