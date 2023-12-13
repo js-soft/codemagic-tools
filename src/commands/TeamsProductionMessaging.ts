@@ -43,7 +43,9 @@ export class TeamsProductionMessaging {
     })
   }
 
-  public parseCLIOptions(argv: yargs.Argv<{}>): TeamsProductionMessagingOptions | Promise<TeamsProductionMessagingOptions> {
+  public parseCLIOptions(
+    argv: yargs.Argv<{}>
+  ): TeamsProductionMessagingOptions | Promise<TeamsProductionMessagingOptions> {
     return argv
       .option("projectName", {
         description: "Name of the project",
