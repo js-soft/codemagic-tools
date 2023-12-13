@@ -51,10 +51,10 @@ export class TeamsMessagingPublish {
 
   public parseCLIOptions(argv: yargs.Argv<{}>): TeamsMessagingPublishOptions | Promise<TeamsMessagingPublishOptions> {
     return argv
-      .option("projectName",{
+      .option("projectName", {
         description: "Name of the project",
         required: true,
-        type: "string",
+        type: "string"
       })
       .option("platform", {
         description: "identifier of the platform for which the build was created",
