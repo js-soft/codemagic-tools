@@ -1,10 +1,19 @@
 #!/usr/bin/env node
 
+import fs from "fs"
 import yargs from "yargs"
+import { CmArtifactLink } from "./CmArtifactLink"
 import { TeamsDevelopMessaging } from "./commands/TeamsDevelopMessaging"
 import { TeamsProductionMessaging } from "./commands/TeamsProductionMessaging"
 
 async function run() {
+  const isSuccess = fs.existsSync("~/SUCCESS")
+
+  const cmArtifactLinks: CmArtifactLink[] = JSON.parse(process.env.CM_ARTIFACT_LINKS!)
+
+  console.log("isSuccess: ", isSuccess)
+  console.log("CM_ARTIFACT_LINKS: ", cmArtifactLinks)
+
   await yargs(process.argv.slice(2))
     .command(
       "teams-develop",
@@ -12,7 +21,11 @@ async function run() {
       async (args) => {
         const teamsMessagingCommand = new TeamsDevelopMessaging()
         const options = await teamsMessagingCommand.parseCLIOptions(args)
-        await teamsMessagingCommand.run(options)
+        await teamsMessagingCommand.run({
+          ...options,
+          wasBuildSuccessful: isSuccess,
+          cmArtifactLinks
+        })
         return options
       }
     )

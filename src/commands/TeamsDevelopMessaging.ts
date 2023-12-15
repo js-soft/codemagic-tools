@@ -57,44 +57,13 @@ export class TeamsDevelopMessaging {
     })
   }
 
-  public parseCLIOptions(argv: yargs.Argv<{}>): TeamsDevelopMessagingOptions | Promise<TeamsDevelopMessagingOptions> {
-    return argv
-      .option("projectName", {
-        description: "name of the Project",
-        required: true,
-        type: "string"
-      })
-      .option("platform", {
-        description: "identifier of the platform for which the build was created",
-        required: true,
-        type: "string",
-        choices: ["ios", "android"]
-      })
-      .option("buildUrl", {
-        description: "link to the build process",
-        required: true,
-        type: "string"
-      })
-      .option("buildNumber", {
-        description: "the number of the run build",
-        required: true,
-        type: "number"
-      })
-      .option("wasBuildSuccessful", {
-        description: "status of the finished build",
-        required: true,
-        type: "boolean"
-      })
-      .option("artifactUrl", {
-        description: "download link for the generated artifact (logs or build)",
-        required: true,
-        type: "string"
-      })
-      .option("webhook", {
-        description: "the webhook of the teams channel, that should receive the message",
-        required: true,
-        type: "string"
-      }).argv
+  public parseCLIOptions(argv: yargs.Argv<{}>): { platform: string } | Promise<{ platform: string }> {
+    return argv.option("platform", {
+      description: "identifier of the platform for which the build was created",
+      required: true,
+      type: "string",
+      choices: ["ios", "android"]
+    }).argv
   }
 
   private isUrlValid(url: string): boolean {
