@@ -32,7 +32,7 @@ export class TeamsDevelopMessaging {
     const platformIdentifier = options.platform.toUpperCase()
 
     const messageContents = {
-      title: `${options.projectName}: New ${statusIdentifier.toLocaleLowerCase()} build - ${platformIdentifier}`,
+      title: `New successful ${options.platform} debug build for the "${options.projectName}" App`,
       summary: `${options.projectName}: ${statusIdentifier} build - ${platformIdentifier}`,
       text: options.wasBuildSuccessful
         ? `Build ${options.buildNumber}: The latest version did build and is now available as an artifact.`

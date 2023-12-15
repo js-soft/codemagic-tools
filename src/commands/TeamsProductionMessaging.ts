@@ -24,10 +24,10 @@ export class TeamsProductionMessaging {
     const platformIdentifier = options.platform.toUpperCase()
     const storeName = platformIdentifier === "IOS" ? "App Store" : "Google Play Store"
     const messageContents = {
-      title: `${options.projectName}: New release is no available in the ${storeName} [${platformIdentifier}]`,
+      title: `${options.projectName}: New release is now available in the ${storeName} [${platformIdentifier}]`,
       summary: `New Release - ${platformIdentifier}`,
-      text: `New Release ${options.buildNumber} - ${platformIdentifier} <br/> 
-      The newly released version is now available in the ${storeName} or can alternatively be directly downloaded below.<br/> `,
+      text: `New Release: #${options.buildNumber} - ${platformIdentifier} <br/> 
+      The newly released version is now available in the ${storeName}. `,
       potentialAction: [
         {
           "@type": "OpenUri",
