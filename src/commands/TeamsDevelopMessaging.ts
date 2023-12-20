@@ -1,14 +1,14 @@
 import axios from "axios"
-import yargs from "yargs"
+import { TeamsCommandLineOptions } from "./TeamsCommandLineOptions"
 
 export interface TeamsDevelopMessagingOptions {
   projectName: string
-  platform: string
-  buildUrl: string
-  buildNumber: number
-  wasBuildSuccessful: boolean
-  artifactUrl: string
   webhook: string
+  artifactUrl: string
+  buildUrl: string
+  buildWasSuccessful: boolean
+  platform: string
+  buildNumber: number
 }
 
 export class TeamsDevelopMessaging {
@@ -28,19 +28,21 @@ export class TeamsDevelopMessaging {
       process.exit(1)
     }
 
-    const statusIdentifier = options.wasBuildSuccessful ? "Successful" : "Failed"
+    const statusIdentifier = options.buildWasSuccessful ? "Successful" : "Failed"
     const platformIdentifier = options.platform.toUpperCase()
 
     const messageContents = {
-      title: `New successful ${options.platform} debug build for the "${options.projectName}" App`,
+      title: `New ${statusIdentifier.toLowerCase()} ${options.platform} debug build for the "${
+        options.projectName
+      }" App`,
       summary: `${options.projectName}: ${statusIdentifier} build - ${platformIdentifier}`,
-      text: options.wasBuildSuccessful
-        ? `Build ${options.buildNumber}: The latest version did build and is now available as an artifact.`
-        : `Build ${options.buildNumber}: A problem occurred while building the newly released version. The corresponding logs are available.`,
+      text: options.buildWasSuccessful
+        ? `New Build: #${options.buildNumber} - ${platformIdentifier} <br/> The latest version build successfully and is now available as an artifact.`
+        : `New Build: #${options.buildNumber} - ${platformIdentifier} <br/> A problem occurred while building the newly released version. The corresponding logs are available.`,
       potentialAction: [
         {
           "@type": "OpenUri",
-          name: options.wasBuildSuccessful ? `Download ${options.platform}-App` : "Open Logs",
+          name: options.buildWasSuccessful ? `Download ${options.platform}-App` : "Download Flutter Logs",
           targets: [{ os: "default", uri: options.artifactUrl }]
         },
         {
@@ -57,15 +59,6 @@ export class TeamsDevelopMessaging {
     })
   }
 
-  public parseCLIOptions(argv: yargs.Argv<{}>): { platform: string } | Promise<{ platform: string }> {
-    return argv.option("platform", {
-      description: "identifier of the platform for which the build was created",
-      required: true,
-      type: "string",
-      choices: ["ios", "android"]
-    }).argv
-  }
-
   private isUrlValid(url: string): boolean {
     try {
       // eslint-disable-next-line no-new
@@ -74,5 +67,32 @@ export class TeamsDevelopMessaging {
     } catch (err) {
       return false
     }
+  }
+
+  public extractArguments(
+    webhook: string,
+    buildWasSuccessful: boolean,
+    buildNumber: number,
+    projectId: string,
+    buildId: string,
+    commandLineOptions: TeamsCommandLineOptions,
+    cmArtifactLink?: string
+  ): TeamsDevelopMessagingOptions {
+    if (cmArtifactLink === undefined && buildWasSuccessful) {
+      console.log("variable CM_ARTIFACT_LINKS must be present in the system, if the build was successful")
+      process.exit(1)
+    }
+
+    const teamsDevelopMessagingOptions: TeamsDevelopMessagingOptions = {
+      projectName: commandLineOptions.projectName,
+      webhook: webhook,
+      artifactUrl: buildWasSuccessful ? cmArtifactLink! : `https://codemagic.io/app/${projectId}/build/${buildId}`,
+      buildUrl: `https://codemagic.io/app/${projectId}/build/${buildId}`,
+      buildWasSuccessful,
+      platform: commandLineOptions.platform,
+      buildNumber: buildNumber
+    }
+
+    return teamsDevelopMessagingOptions
   }
 }

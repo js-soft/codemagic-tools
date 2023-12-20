@@ -1,5 +1,6 @@
 import axios from "axios"
 import yargs from "yargs"
+import { TeamsCommandLineOptions } from "./TeamsCommandLineOptions"
 
 export interface TeamsProductionMessagingOptions {
   projectName: string
@@ -43,9 +44,7 @@ export class TeamsProductionMessaging {
     })
   }
 
-  public parseCLIOptions(
-    argv: yargs.Argv<{}>
-  ): TeamsProductionMessagingOptions | Promise<TeamsProductionMessagingOptions> {
+  public parseCLIOptions(argv: yargs.Argv<{}>): TeamsCommandLineOptions | Promise<TeamsCommandLineOptions> {
     return argv
       .option("projectName", {
         description: "Name of the project",
@@ -57,21 +56,6 @@ export class TeamsProductionMessaging {
         required: true,
         type: "string",
         choices: ["ios", "android"]
-      })
-      .option("buildUrl", {
-        description: "a link to the build page",
-        required: true,
-        type: "string"
-      })
-      .option("buildNumber", {
-        description: "the number of the run build",
-        required: true,
-        type: "number"
-      })
-      .option("webhook", {
-        description: "the webhook of the teams channel, that should receive the message",
-        required: true,
-        type: "string"
       }).argv
   }
 
@@ -83,5 +67,23 @@ export class TeamsProductionMessaging {
     } catch (err) {
       return false
     }
+  }
+
+  public extractArguments(
+    webhook: string,
+    buildNumber: number,
+    projectId: string,
+    buildId: string,
+    commandLineOptions: TeamsCommandLineOptions
+  ): TeamsProductionMessagingOptions {
+    const teamsDevelopMessagingOptions: TeamsProductionMessagingOptions = {
+      projectName: commandLineOptions.projectName,
+      platform: commandLineOptions.platform,
+      buildUrl: `https://codemagic.io/app/${projectId}/build/${buildId}`,
+      buildNumber: buildNumber,
+      webhook: webhook
+    }
+
+    return teamsDevelopMessagingOptions
   }
 }
