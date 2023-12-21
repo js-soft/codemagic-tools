@@ -4,8 +4,8 @@ import fs from "fs";
 import yargs from "yargs";
 import { CmArtifactLink } from "./CmArtifactLink";
 import { TeamsCommandLineOptions } from "./commands/TeamsCommandLineOptions";
-import { TeamsDevelopMessaging } from "./commands/TeamsDevelopMessaging";
-import { TeamsProductionMessaging } from "./commands/TeamsProductionMessaging";
+import { runTeamsDevelopMessagingCommand } from "./commands/TeamsDevelopMessaging";
+import { runTeamsProductionMessagingCommand } from "./commands/TeamsProductionMessaging";
 
 async function run() {
   const buildWasSuccessful = fs.existsSync("~/SUCCESS");
@@ -52,10 +52,9 @@ async function run() {
       "After Codemagic Build: Send MS-Teams message informing about the new build",
       undefined,
       async (args) => {
-        const teamsMessagingCommand = new TeamsDevelopMessaging();
         checkArtifactLinkMatchesPlatform(args, artifactUrl);
 
-        await teamsMessagingCommand.run({
+        await runTeamsDevelopMessagingCommand({
           projectName: args.projectName,
           webhook,
           artifactUrl,
@@ -70,17 +69,14 @@ async function run() {
       "teams-production",
       "After Codemagic Publish: Send MS-Teams message informing about the new release",
       undefined,
-      async (args) => {
-        const teamsMessagePublish = new TeamsProductionMessaging();
-
-        await teamsMessagePublish.run({
+      async (args) =>
+        await runTeamsProductionMessagingCommand({
           projectName: args.projectName,
           platform: args.platform,
           buildUrl,
           buildNumber,
           webhook
-        });
-      }
+        })
     )
     .demandCommand(1, "Must provide a valid command from the ones listed above.")
     .scriptName("jscm")
