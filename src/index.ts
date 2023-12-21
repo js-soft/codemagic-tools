@@ -3,9 +3,9 @@
 import fs from "fs"
 import yargs from "yargs"
 import { CmArtifactLink } from "./CmArtifactLink"
+import { TeamsCommandLineOptions } from "./commands/TeamsCommandLineOptions"
 import { TeamsDevelopMessaging } from "./commands/TeamsDevelopMessaging"
 import { TeamsProductionMessaging } from "./commands/TeamsProductionMessaging"
-import { TeamsCommandLineOptions } from "./commands/TeamsCommandLineOptions"
 
 async function run() {
   const buildWasSuccessful = fs.existsSync("~/SUCCESS")
@@ -13,79 +13,29 @@ async function run() {
   const webhook = process.env.teams_webhook_url!
   const buildId = process.env.CM_BUILD_ID!
   const projectId = process.env.CM_PROJECT_ID!
-  const buildNumber = process.env.BUILD_NUMBER!
+  const buildNumber = parseInt(process.env.BUILD_NUMBER!)
+  const buildUrl = `https://codemagic.io/app/${projectId}/build/${buildId}`
 
-  let cmArtifactLink: string
-  try {
-    const cmArtifactLinks: CmArtifactLink[] = JSON.parse(process.env.CM_ARTIFACT_LINKS!).filter(
-      (element: any) => element.type === "apk" || element.type === "ipa"
+  if (process.env.CM_ARTIFACT_LINKS === undefined) {
+    console.error(
+      "To ensure correct execution the environment variable CM_ARTIFACT_LINKS must be present in the system"
     )
-    let artifactLink: string
-    if (cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa").length !== 0) {
-      artifactLink = cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa")[0].url
-    } else {
-      // should link to the workflow-log can be determined from buildId and projectId
-      artifactLink = `https://codemagic.io/app/${projectId}/build/${buildId}`
-    }
-    cmArtifactLink = artifactLink
-  } catch (error) {
-    console.log(error)
-    console.log("To ensure correct execution the environment variable CM_ARTIFACT_LINKS must be present in the system")
     process.exit(1)
   }
 
+  let artifactUrl: string
+
+  const cmArtifactLinks: CmArtifactLink[] = JSON.parse(process.env.CM_ARTIFACT_LINKS!).filter(
+    (element: any) => element.type === "apk" || element.type === "ipa"
+  )
+  if (cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa").length !== 0) {
+    artifactUrl = cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa")[0].url
+  } else {
+    // should link to the workflow-log can be determined from buildId and projectId
+    artifactUrl = buildUrl
+  }
+
   await yargs(process.argv.slice(2))
-    .command(
-      "teams-develop",
-      "After Codemagic Build: Send MS-Teams message informing about the new build",
-      async () => {
-        const teamsMessagingCommand = new TeamsDevelopMessaging()
-        const unresolvedOptions = parseCLIOptionsTeams(yargs)
-        const resolvedOptions: { platform: string; projectName: string } =
-          unresolvedOptions instanceof Promise ? await unresolvedOptions : unresolvedOptions
-        checkArtifactLinkMatchesPlatform(resolvedOptions, cmArtifactLink)
-
-        const parameters = teamsMessagingCommand.extractArguments(
-          webhook,
-          buildWasSuccessful,
-          Number(buildNumber),
-          projectId,
-          buildId,
-          resolvedOptions,
-          cmArtifactLink
-        )
-        await teamsMessagingCommand.run(parameters)
-        return
-      }
-    )
-    .command(
-      "teams-production",
-      "After Codemagic Publish: Send MS-Teams message informing about the new release",
-      async () => {
-        const teamsMessagePublish = new TeamsProductionMessaging()
-        const unresolvedOptions = parseCLIOptionsTeams(yargs)
-        const resolvedOptions: { platform: string; projectName: string } =
-          unresolvedOptions instanceof Promise ? await unresolvedOptions : unresolvedOptions
-        checkArtifactLinkMatchesPlatform(resolvedOptions, cmArtifactLink)
-
-        const options = teamsMessagePublish.extractArguments(
-          webhook,
-          Number(buildNumber),
-          projectId,
-          buildId,
-          resolvedOptions
-        )
-        await teamsMessagePublish.run(options)
-        return resolvedOptions
-      }
-    )
-    .demand(1, "Must provide a valid command from the ones listed above.")
-    .scriptName("jscm")
-    .parseAsync()
-}
-
-function parseCLIOptionsTeams(argv: yargs.Argv<{}>): TeamsCommandLineOptions | Promise<TeamsCommandLineOptions> {
-  return argv
     .option("platform", {
       description: "identifier of the platform for which the build was created",
       required: true,
@@ -93,10 +43,48 @@ function parseCLIOptionsTeams(argv: yargs.Argv<{}>): TeamsCommandLineOptions | P
       choices: ["ios", "android"]
     })
     .option("projectName", {
-      description: "objectIdentifier",
+      description: "Name of the project",
       required: true,
       type: "string"
-    }).argv
+    })
+    .command(
+      "teams-develop",
+      "After Codemagic Build: Send MS-Teams message informing about the new build",
+      undefined,
+      async (args) => {
+        const teamsMessagingCommand = new TeamsDevelopMessaging()
+        checkArtifactLinkMatchesPlatform(args, artifactUrl)
+
+        await teamsMessagingCommand.run({
+          projectName: args.projectName,
+          webhook,
+          artifactUrl,
+          buildUrl,
+          buildWasSuccessful,
+          platform: args.platform,
+          buildNumber
+        })
+      }
+    )
+    .command(
+      "teams-production",
+      "After Codemagic Publish: Send MS-Teams message informing about the new release",
+      undefined,
+      async (args) => {
+        const teamsMessagePublish = new TeamsProductionMessaging()
+
+        await teamsMessagePublish.run({
+          projectName: args.projectName,
+          platform: args.platform,
+          buildUrl,
+          buildNumber,
+          webhook
+        })
+      }
+    )
+    .demandCommand(1, "Must provide a valid command from the ones listed above.")
+    .scriptName("jscm")
+    .parseAsync()
 }
 
 function checkArtifactLinkMatchesPlatform(resolvedOptions: TeamsCommandLineOptions, cmArtifactLink: string) {

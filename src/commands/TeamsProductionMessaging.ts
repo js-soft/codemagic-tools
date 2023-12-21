@@ -1,6 +1,4 @@
 import axios from "axios"
-import yargs from "yargs"
-import { TeamsCommandLineOptions } from "./TeamsCommandLineOptions"
 import { isUrlValid } from "./isUrlValid"
 
 export interface TeamsProductionMessagingOptions {
@@ -43,38 +41,5 @@ export class TeamsProductionMessaging {
       console.log("Could not send message to teams channel.")
       process.exit(1)
     })
-  }
-
-  public parseCLIOptions(argv: yargs.Argv<{}>): TeamsCommandLineOptions | Promise<TeamsCommandLineOptions> {
-    return argv
-      .option("projectName", {
-        description: "Name of the project",
-        required: true,
-        type: "string"
-      })
-      .option("platform", {
-        description: "identifier of the platform for which the build was created",
-        required: true,
-        type: "string",
-        choices: ["ios", "android"]
-      }).argv
-  }
-
-  public extractArguments(
-    webhook: string,
-    buildNumber: number,
-    projectId: string,
-    buildId: string,
-    commandLineOptions: TeamsCommandLineOptions
-  ): TeamsProductionMessagingOptions {
-    const teamsDevelopMessagingOptions: TeamsProductionMessagingOptions = {
-      projectName: commandLineOptions.projectName,
-      platform: commandLineOptions.platform,
-      buildUrl: `https://codemagic.io/app/${projectId}/build/${buildId}`,
-      buildNumber: buildNumber,
-      webhook: webhook
-    }
-
-    return teamsDevelopMessagingOptions
   }
 }

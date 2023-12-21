@@ -1,5 +1,4 @@
 import axios from "axios"
-import { TeamsCommandLineOptions } from "./TeamsCommandLineOptions"
 import { isUrlValid } from "./isUrlValid"
 
 export interface TeamsDevelopMessagingOptions {
@@ -58,32 +57,5 @@ export class TeamsDevelopMessaging {
       console.log("Could not send message to teams channel.")
       process.exit(1)
     })
-  }
-
-  public extractArguments(
-    webhook: string,
-    buildWasSuccessful: boolean,
-    buildNumber: number,
-    projectId: string,
-    buildId: string,
-    commandLineOptions: TeamsCommandLineOptions,
-    cmArtifactLink?: string
-  ): TeamsDevelopMessagingOptions {
-    if (cmArtifactLink === undefined && buildWasSuccessful) {
-      console.log("variable CM_ARTIFACT_LINKS must be present in the system, if the build was successful")
-      process.exit(1)
-    }
-
-    const teamsDevelopMessagingOptions: TeamsDevelopMessagingOptions = {
-      projectName: commandLineOptions.projectName,
-      webhook: webhook,
-      artifactUrl: buildWasSuccessful ? cmArtifactLink! : `https://codemagic.io/app/${projectId}/build/${buildId}`,
-      buildUrl: `https://codemagic.io/app/${projectId}/build/${buildId}`,
-      buildWasSuccessful,
-      platform: commandLineOptions.platform,
-      buildNumber: buildNumber
-    }
-
-    return teamsDevelopMessagingOptions
   }
 }
