@@ -1,38 +1,38 @@
 #!/usr/bin/env node
 
-import fs from "fs"
-import yargs from "yargs"
-import { CmArtifactLink } from "./CmArtifactLink"
-import { TeamsCommandLineOptions } from "./commands/TeamsCommandLineOptions"
-import { TeamsDevelopMessaging } from "./commands/TeamsDevelopMessaging"
-import { TeamsProductionMessaging } from "./commands/TeamsProductionMessaging"
+import fs from "fs";
+import yargs from "yargs";
+import { CmArtifactLink } from "./CmArtifactLink";
+import { TeamsCommandLineOptions } from "./commands/TeamsCommandLineOptions";
+import { TeamsDevelopMessaging } from "./commands/TeamsDevelopMessaging";
+import { TeamsProductionMessaging } from "./commands/TeamsProductionMessaging";
 
 async function run() {
-  const buildWasSuccessful = fs.existsSync("~/SUCCESS")
+  const buildWasSuccessful = fs.existsSync("~/SUCCESS");
 
-  const webhook = process.env.teams_webhook_url!
-  const buildId = process.env.CM_BUILD_ID!
-  const projectId = process.env.CM_PROJECT_ID!
-  const buildNumber = parseInt(process.env.BUILD_NUMBER!)
-  const buildUrl = `https://codemagic.io/app/${projectId}/build/${buildId}`
+  const webhook = process.env.teams_webhook_url!;
+  const buildId = process.env.CM_BUILD_ID!;
+  const projectId = process.env.CM_PROJECT_ID!;
+  const buildNumber = parseInt(process.env.BUILD_NUMBER!);
+  const buildUrl = `https://codemagic.io/app/${projectId}/build/${buildId}`;
 
   if (process.env.CM_ARTIFACT_LINKS === undefined) {
     console.error(
       "To ensure correct execution the environment variable CM_ARTIFACT_LINKS must be present in the system"
-    )
-    process.exit(1)
+    );
+    process.exit(1);
   }
 
-  let artifactUrl: string
+  let artifactUrl: string;
 
   const cmArtifactLinks: CmArtifactLink[] = JSON.parse(process.env.CM_ARTIFACT_LINKS!).filter(
     (element: any) => element.type === "apk" || element.type === "ipa"
-  )
+  );
   if (cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa").length !== 0) {
-    artifactUrl = cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa")[0].url
+    artifactUrl = cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa")[0].url;
   } else {
     // should link to the workflow-log can be determined from buildId and projectId
-    artifactUrl = buildUrl
+    artifactUrl = buildUrl;
   }
 
   await yargs(process.argv.slice(2))
@@ -52,8 +52,8 @@ async function run() {
       "After Codemagic Build: Send MS-Teams message informing about the new build",
       undefined,
       async (args) => {
-        const teamsMessagingCommand = new TeamsDevelopMessaging()
-        checkArtifactLinkMatchesPlatform(args, artifactUrl)
+        const teamsMessagingCommand = new TeamsDevelopMessaging();
+        checkArtifactLinkMatchesPlatform(args, artifactUrl);
 
         await teamsMessagingCommand.run({
           projectName: args.projectName,
@@ -63,7 +63,7 @@ async function run() {
           buildWasSuccessful,
           platform: args.platform,
           buildNumber
-        })
+        });
       }
     )
     .command(
@@ -71,7 +71,7 @@ async function run() {
       "After Codemagic Publish: Send MS-Teams message informing about the new release",
       undefined,
       async (args) => {
-        const teamsMessagePublish = new TeamsProductionMessaging()
+        const teamsMessagePublish = new TeamsProductionMessaging();
 
         await teamsMessagePublish.run({
           projectName: args.projectName,
@@ -79,12 +79,12 @@ async function run() {
           buildUrl,
           buildNumber,
           webhook
-        })
+        });
       }
     )
     .demandCommand(1, "Must provide a valid command from the ones listed above.")
     .scriptName("jscm")
-    .parseAsync()
+    .parseAsync();
 }
 
 function checkArtifactLinkMatchesPlatform(resolvedOptions: TeamsCommandLineOptions, cmArtifactLink: string) {
@@ -93,14 +93,14 @@ function checkArtifactLinkMatchesPlatform(resolvedOptions: TeamsCommandLineOptio
     (resolvedOptions.platform === "ios" && cmArtifactLink.includes("ipa")!) ||
     (resolvedOptions.platform === "android" && cmArtifactLink.includes("apk")!)
   ) {
-    console.log("The artifact link does not have the correct type for the given platform")
-    process.exit(1)
+    console.log("The artifact link does not have the correct type for the given platform");
+    process.exit(1);
   }
 }
 
 run()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error(error)
-    process.exit(1)
-  })
+    console.error(error);
+    process.exit(1);
+  });

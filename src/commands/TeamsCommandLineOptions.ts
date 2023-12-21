@@ -1,4 +1,4 @@
 export interface TeamsCommandLineOptions {
-  platform: string
-  projectName: string
+  platform: string;
+  projectName: string;
 }
