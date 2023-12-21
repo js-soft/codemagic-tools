@@ -1,6 +1,7 @@
 import axios from "axios"
 import yargs from "yargs"
 import { TeamsCommandLineOptions } from "./TeamsCommandLineOptions"
+import { isUrlValid } from "./isUrlValid"
 
 export interface TeamsProductionMessagingOptions {
   projectName: string
@@ -12,12 +13,12 @@ export interface TeamsProductionMessagingOptions {
 
 export class TeamsProductionMessaging {
   public async run(options: TeamsProductionMessagingOptions): Promise<void> {
-    if (!this.isUrlValid(options.webhook)) {
+    if (!isUrlValid(options.webhook)) {
       console.error("The given webhook is not valid.")
       process.exit(1)
     }
 
-    if (!this.isUrlValid(options.buildUrl)) {
+    if (!isUrlValid(options.buildUrl)) {
       console.error("The given buildUrl is not valid.")
       process.exit(1)
     }
@@ -57,16 +58,6 @@ export class TeamsProductionMessaging {
         type: "string",
         choices: ["ios", "android"]
       }).argv
-  }
-
-  private isUrlValid(url: string): boolean {
-    try {
-      // eslint-disable-next-line no-new
-      new URL(url)
-      return true
-    } catch (err) {
-      return false
-    }
   }
 
   public extractArguments(

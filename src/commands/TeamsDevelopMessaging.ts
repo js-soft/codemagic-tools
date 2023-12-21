@@ -1,5 +1,6 @@
 import axios from "axios"
 import { TeamsCommandLineOptions } from "./TeamsCommandLineOptions"
+import { isUrlValid } from "./isUrlValid"
 
 export interface TeamsDevelopMessagingOptions {
   projectName: string
@@ -13,17 +14,17 @@ export interface TeamsDevelopMessagingOptions {
 
 export class TeamsDevelopMessaging {
   public async run(options: TeamsDevelopMessagingOptions): Promise<void> {
-    if (!this.isUrlValid(options.webhook)) {
+    if (!isUrlValid(options.webhook)) {
       console.error("The given webhook is not valid.")
       process.exit(1)
     }
 
-    if (!this.isUrlValid(options.artifactUrl)) {
+    if (!isUrlValid(options.artifactUrl)) {
       console.error("The given artifactUrl is not valid.")
       process.exit(1)
     }
 
-    if (!this.isUrlValid(options.buildUrl)) {
+    if (!isUrlValid(options.buildUrl)) {
       console.error("The given buildUrl is not valid.")
       process.exit(1)
     }
@@ -57,16 +58,6 @@ export class TeamsDevelopMessaging {
       console.log("Could not send message to teams channel.")
       process.exit(1)
     })
-  }
-
-  private isUrlValid(url: string): boolean {
-    try {
-      // eslint-disable-next-line no-new
-      new URL(url)
-      return true
-    } catch (err) {
-      return false
-    }
   }
 
   public extractArguments(
