@@ -13,8 +13,42 @@ npm install @js-soft/codemagic-tools
 
 ## Usage
 
+### Teams Messaging
+
+#### Build Messages
 ```bash
-jscm --help
+jscm teams-develop --platform <platform> --projectName <projectName>
+```
+This command will inform about a new build and additionally provide a link to the build. In case of a failed build it will also provide a link to the build log.
+
+### Production Messages
+```bash
+jscm teams-publish --platform <platform> --projectName <projectName>
+```
+This command will inform about a newly released version. It aditionally provides a link to the build logs.
+
+## Testing
+For testing a JSON like created in Codemagic is provided. Additionally a bash-script, which
+can be used to test the command is provided. Upon execution the
+test script will ask you to specify the following variables:
+
+* webhook -  webhook url you want to send to / or just some valid https-address
+* BuildId - a string
+* ProjectId - a string
+* buildNumber - a number
+
+After preparation of your local environment the script will execute the jscm command.
+
+It will execute both possible command:
+
+* teams-develop (in failed/successful state)
+* teams-production (in failed/successful state)
+
+&rarr; This will result in 4 messages being sent to the specified teams channel
+
+### Calling the test script
+```bash
+./test/test_teams_messaging.sh
 ```
 
 ## License

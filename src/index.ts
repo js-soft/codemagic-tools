@@ -24,7 +24,7 @@ async function run() {
   }
 
   let artifactUrl: string;
-
+  
   const cmArtifactLinks: CmArtifactLink[] = JSON.parse(process.env.CM_ARTIFACT_LINKS!).filter(
     (element: any) => element.type === "apk" || element.type === "ipa"
   );
@@ -37,7 +37,7 @@ async function run() {
 
   await yargs(process.argv.slice(2))
     .option("platform", {
-      description: "identifier of the platform for which the build was created",
+      description: "Identifier of the platform for which the build was created",
       required: true,
       type: "string",
       choices: ["ios", "android"]
@@ -50,7 +50,10 @@ async function run() {
     .command(
       "teams-develop",
       "After Codemagic Build: Send MS-Teams message informing about the new build",
-      undefined,
+      // empty function to avoid yargs internal error
+      () => {
+        return
+      },
       async (args) => {
         checkArtifactLinkMatchesPlatform(args, artifactUrl);
 
@@ -68,7 +71,10 @@ async function run() {
     .command(
       "teams-production",
       "After Codemagic Publish: Send MS-Teams message informing about the new release",
-      undefined,
+      // empty function to avoid yargs internal error
+      () => {
+        return
+      },  
       async (args) =>
         await runTeamsProductionMessagingCommand({
           projectName: args.projectName,
@@ -86,8 +92,8 @@ async function run() {
 function checkArtifactLinkMatchesPlatform(resolvedOptions: TeamsCommandLineOptions, cmArtifactLink: string) {
   // throw exception if the artifact link does not have the correct type for the given platform
   if (
-    (resolvedOptions.platform === "ios" && cmArtifactLink.includes("ipa")!) ||
-    (resolvedOptions.platform === "android" && cmArtifactLink.includes("apk")!)
+    (resolvedOptions.platform === "ios" && !cmArtifactLink.includes("ipa")!) ||
+    (resolvedOptions.platform === "android" && !cmArtifactLink.includes("apk")!)
   ) {
     console.log("The artifact link does not have the correct type for the given platform");
     process.exit(1);
