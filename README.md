@@ -15,13 +15,13 @@ npm install @js-soft/codemagic-tools
 
 ### Teams Messaging
 
-#### Build Messages
+#### Develop Messages
 
 ```bash
 jscm teams-develop --platform <platform> --projectName <projectName>
 ```
 
-This command will inform about a new build and additionally provide a link to the build. In case of a failed build it will also provide a link to the build log.
+This command will inform about a new development build and additionally provide a link to the build. In case of a failed build it will also provide a link to the build log.
 
 ### Production Messages
 
@@ -29,7 +29,7 @@ This command will inform about a new build and additionally provide a link to th
 jscm teams-publish --platform <platform> --projectName <projectName>
 ```
 
-This command will inform about a newly released version. It aditionally provides a link to the build logs.
+This command will inform about an app version, that was released in a store. It additionally provides a link to the build logs.
 
 ## Testing
 
