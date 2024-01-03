@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Codemagic_Release.ipa",
+    "type": "ipa",
+    "url": "https://www.test.com",
+    "md5": "11111111111111111111111111111111",
+    "versionName": "1.0.0",
+    "bundleId": "io.codemagic.app"
+  },
+  {
+    "name": "logs.txt",
+    "type": "txt",
+    "url": "https://www.test.com/logs.txt",
+    "md5": "00000000000000000000000000000000"
+  }
+]
