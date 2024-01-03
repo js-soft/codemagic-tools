@@ -24,15 +24,19 @@ async function run() {
   }
 
   let artifactUrl: string;
+  let artifactType: string;
 
   const cmArtifactLinks: CmArtifactLink[] = JSON.parse(process.env.CM_ARTIFACT_LINKS!).filter(
     (element: any) => element.type === "apk" || element.type === "ipa"
   );
   if (cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa").length !== 0) {
-    artifactUrl = cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa")[0].url;
+    const pickedElement = cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa")[0];
+    artifactUrl = pickedElement.url;
+    artifactType = pickedElement.type;
   } else {
     // should link to the workflow-log can be determined from buildId and projectId
     artifactUrl = buildUrl;
+    artifactType = "logs";
   }
 
   await yargs(process.argv.slice(2))
@@ -55,7 +59,7 @@ async function run() {
         return;
       },
       async (args) => {
-        checkArtifactLinkMatchesPlatform(args, artifactUrl);
+        checkArtifactLinkMatchesPlatform(args, artifactType);
 
         await runTeamsDevelopMessagingCommand({
           projectName: args.projectName,
@@ -89,11 +93,15 @@ async function run() {
     .parseAsync();
 }
 
-function checkArtifactLinkMatchesPlatform(resolvedOptions: TeamsCommandLineOptions, cmArtifactLink: string) {
+function checkArtifactLinkMatchesPlatform(resolvedOptions: TeamsCommandLineOptions, artifactType: string) {
   // throw exception if the artifact link does not have the correct type for the given platform
+  if (artifactType === "logs") {
+    return;
+  }
+
   if (
-    (resolvedOptions.platform === "ios" && !cmArtifactLink.includes("ipa")) ||
-    (resolvedOptions.platform === "android" && !cmArtifactLink.includes("apk"))
+    (resolvedOptions.platform === "ios" && artifactType === "apk") ||
+    (resolvedOptions.platform === "android" && artifactType === "ipa")
   ) {
     console.log("The artifact link does not have the correct type for the given platform");
     process.exit(1);
