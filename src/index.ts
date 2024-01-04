@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import fs from "fs";
+import os from "os";
 import yargs from "yargs";
 import { CmArtifactLink } from "./CmArtifactLink";
 import { TeamsCommandLineOptions } from "./commands/TeamsCommandLineOptions";
@@ -8,7 +9,7 @@ import { runTeamsDevelopMessagingCommand } from "./commands/TeamsDevelopMessagin
 import { runTeamsProductionMessagingCommand } from "./commands/TeamsProductionMessaging";
 
 async function run() {
-  const buildWasSuccessful = fs.existsSync("~/SUCCESS");
+  const buildWasSuccessful = fs.existsSync(`${os.homedir()}/SUCCESS`);
 
   const webhook = process.env.teams_webhook_url!;
   const buildId = process.env.CM_BUILD_ID!;
