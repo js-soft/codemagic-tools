@@ -83,14 +83,23 @@ async function run() {
       () => {
         return;
       },
-      async (args) =>
+      async (args) => {
+        if (failedState) {
+          console.log("Cannot send production message for a build, which did not produce an artifact.");
+          process.exit(1);
+        }
+        if (!buildWasSuccessful) {
+          console.log("Cannot send production message for failed build.");
+          process.exit(1);
+        }
         await runTeamsProductionMessagingCommand({
           projectName: args.projectName,
           platform: args.platform,
           buildUrl,
           buildNumber,
           webhook
-        })
+        });
+      }
     )
     .demandCommand(1, "Must provide a valid command from the ones listed above.")
     .scriptName("jscm")
