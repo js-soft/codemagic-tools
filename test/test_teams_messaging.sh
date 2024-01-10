@@ -28,8 +28,6 @@ export CM_ARTIFACT_LINKS=$(cat artifactLinks.json)
 echo "created the artifactLinks environment variable"
 echo "--------------------------------------------"
 
-echo "webhook url: $teams_webhook_url"
-
 echo "Testing with the artifactLinks environment variable"
 jscm teams-develop --platform "ios" --projectName "Mein Codemagic Test Projekt"
 jscm teams-production --platform "ios" --projectName "Mein Codemagic Test Projekt"
