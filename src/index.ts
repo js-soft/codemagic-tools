@@ -3,7 +3,7 @@
 import fs from "fs";
 import os from "os";
 import yargs from "yargs";
-import { CmArtifactLink } from "./CmArtifactLink";
+
 import { TeamsCommandLineOptions } from "./commands/TeamsCommandLineOptions";
 import { runTeamsDevelopMessagingCommand } from "./commands/TeamsDevelopMessaging";
 import { runTeamsProductionMessagingCommand } from "./commands/TeamsProductionMessaging";
@@ -17,24 +17,27 @@ async function run() {
   const buildNumber = parseInt(process.env.BUILD_NUMBER!);
   const buildUrl = `https://codemagic.io/app/${projectId}/build/${buildId}`;
 
-  if (process.env.CM_ARTIFACT_LINKS === undefined) {
-    console.error(
-      "To ensure correct execution the environment variable CM_ARTIFACT_LINKS must be present in the system"
-    );
-    process.exit(1);
-  }
-
   let artifactUrl: string;
   let artifactType: string;
 
-  const cmArtifactLinks: CmArtifactLink[] = JSON.parse(process.env.CM_ARTIFACT_LINKS!).filter(
-    (element: any) => element.type === "apk" || element.type === "ipa"
-  );
-  if (cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa").length !== 0) {
-    const pickedElement = cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa")[0];
-    artifactUrl = pickedElement.url;
-    artifactType = pickedElement.type;
+  let failedState = false;
+
+  if (process.env.CM_ARTIFACT_LINKS === undefined) {
+    failedState = true;
   } else {
+    const cmArtifactLinks = JSON.parse(process.env.CM_ARTIFACT_LINKS);
+    if (cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa").length === 0) {
+      failedState = true;
+    } else {
+      const pickedElement = cmArtifactLinks.filter(
+        (element: any) => element.type === "apk" || element.type === "ipa"
+      )[0];
+      artifactUrl = pickedElement.url;
+      artifactType = pickedElement.type;
+    }
+  }
+
+  if (failedState) {
     // should link to the workflow-log can be determined from buildId and projectId
     artifactUrl = buildUrl;
     artifactType = "logs";
