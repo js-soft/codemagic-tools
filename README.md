@@ -49,7 +49,7 @@ It will execute both possible command:
 - teams-develop (in failed/successful state/without artifacts)
 - teams-production (in failed/successful state/without artifacts)
 
-&rarr; This will result in 4(2 failed/2 successful) messages being sent to the specified teams channel as well as 2 exceptions exceptions.
+&rarr; This will result in 6(4 failed/2 successful) messages being sent to the specified teams channel.
 
 ### Calling the test script
 
