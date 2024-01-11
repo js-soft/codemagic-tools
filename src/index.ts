@@ -20,14 +20,10 @@ async function run() {
   let artifactUrl: string;
   let artifactType: string;
 
-  let failedState = false;
-
-  if (process.env.CM_ARTIFACT_LINKS === undefined) {
-    failedState = true;
-  } else {
+  if (process.env.CM_ARTIFACT_LINKS !== undefined) {
     const cmArtifactLinks = JSON.parse(process.env.CM_ARTIFACT_LINKS);
     if (cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa").length === 0) {
-      failedState = true;
+      buildWasSuccessful = false;
     } else {
       const pickedElement = cmArtifactLinks.filter(
         (element: any) => element.type === "apk" || element.type === "ipa"
@@ -37,7 +33,7 @@ async function run() {
     }
   }
 
-  if (failedState) {
+  if (!buildWasSuccessful) {
     // should link to the workflow-log can be determined from buildId and projectId
     artifactUrl = buildUrl;
     artifactType = "logs";
@@ -84,9 +80,7 @@ async function run() {
         return;
       },
       async (args) => {
-        if (failedState) {
-          buildWasSuccessful = false;
-        }
+        checkArtifactLinkMatchesPlatform(args, artifactType);
 
         await runTeamsProductionMessagingCommand({
           projectName: args.projectName,
