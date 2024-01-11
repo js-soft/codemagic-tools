@@ -7,6 +7,7 @@ export interface TeamsProductionMessagingOptions {
   buildUrl: string;
   buildNumber: number;
   webhook: string;
+  successfulBuild: boolean;
 }
 
 export async function runTeamsProductionMessagingCommand(options: TeamsProductionMessagingOptions): Promise<void> {
@@ -22,15 +23,20 @@ export async function runTeamsProductionMessagingCommand(options: TeamsProductio
 
   const platformIdentifier = options.platform.toUpperCase();
   const storeName = platformIdentifier === "IOS" ? "App Store" : "Google Play Store";
+  const productionMessage = options.successfulBuild
+    ? `New release is now available in the ${storeName}`
+    : "New release failed to build";
+
   const messageContents = {
-    title: `${options.projectName}: New release is now available in the ${storeName} [${platformIdentifier}]`,
+    title: options.successfulBuild
+      ? `${options.projectName}: New release is now available in the ${storeName} [${platformIdentifier}]`
+      : `${options.projectName}: New release failed to build [${platformIdentifier}]`,
     summary: `New Release - ${platformIdentifier}`,
-    text: `New Release: #${options.buildNumber} - ${platformIdentifier} <br/> 
-      The newly released version is now available in the ${storeName}. `,
+    text: `New Release: #${options.buildNumber} - ${platformIdentifier} <br/>${productionMessage}`,
     potentialAction: [
       {
         "@type": "OpenUri",
-        name: "Open Build",
+        name: options.successfulBuild ? "Open Build" : "Open Build Logs",
         targets: [{ os: "default", uri: options.buildUrl }]
       }
     ]

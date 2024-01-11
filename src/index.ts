@@ -9,7 +9,7 @@ import { runTeamsDevelopMessagingCommand } from "./commands/TeamsDevelopMessagin
 import { runTeamsProductionMessagingCommand } from "./commands/TeamsProductionMessaging";
 
 async function run() {
-  const buildWasSuccessful = fs.existsSync(`${os.homedir()}/SUCCESS`);
+  let buildWasSuccessful = fs.existsSync(`${os.homedir()}/SUCCESS`);
 
   const webhook = process.env.teams_webhook_url!;
   const buildId = process.env.CM_BUILD_ID!;
@@ -85,19 +85,16 @@ async function run() {
       },
       async (args) => {
         if (failedState) {
-          console.log("Cannot send production message for a build, which did not produce an artifact.");
-          process.exit(1);
+          buildWasSuccessful = false;
         }
-        if (!buildWasSuccessful) {
-          console.log("Cannot send production message for failed build.");
-          process.exit(1);
-        }
+
         await runTeamsProductionMessagingCommand({
           projectName: args.projectName,
           platform: args.platform,
           buildUrl,
           buildNumber,
-          webhook
+          webhook,
+          successfulBuild: buildWasSuccessful
         });
       }
     )
