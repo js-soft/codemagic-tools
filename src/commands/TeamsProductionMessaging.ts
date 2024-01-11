@@ -25,12 +25,12 @@ export async function runTeamsProductionMessagingCommand(options: TeamsProductio
   const storeName = platformIdentifier === "IOS" ? "App Store" : "Google Play Store";
   const productionMessage = options.successfulBuild
     ? `New release is now available in the ${storeName}`
-    : "New release failed to build";
+    : "New release could not be created.";
 
   const messageContents = {
     title: options.successfulBuild
       ? `${options.projectName}: New release is now available in the ${storeName} [${platformIdentifier}]`
-      : `${options.projectName}: New release failed to build [${platformIdentifier}]`,
+      : `${options.projectName}: New release could not be created [${platformIdentifier}]`,
     summary: `New Release - ${platformIdentifier}`,
     text: `New Release: #${options.buildNumber} - ${platformIdentifier} <br/>${productionMessage}`,
     potentialAction: [
