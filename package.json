@@ -1,6 +1,6 @@
 {
   "name": "@js-soft/codemagic-tools",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Codemagic extended tooling",
   "homepage": "https://github.com/js-soft/codemagic-tools#readme",
   "bugs": {
