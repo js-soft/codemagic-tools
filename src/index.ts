@@ -3,13 +3,13 @@
 import fs from "fs";
 import os from "os";
 import yargs from "yargs";
-import { CmArtifactLink } from "./CmArtifactLink";
+
 import { TeamsCommandLineOptions } from "./commands/TeamsCommandLineOptions";
 import { runTeamsDevelopMessagingCommand } from "./commands/TeamsDevelopMessaging";
 import { runTeamsProductionMessagingCommand } from "./commands/TeamsProductionMessaging";
 
 async function run() {
-  const buildWasSuccessful = fs.existsSync(`${os.homedir()}/SUCCESS`);
+  let buildWasSuccessful = fs.existsSync(`${os.homedir()}/SUCCESS`);
 
   const webhook = process.env.teams_webhook_url!;
   const buildId = process.env.CM_BUILD_ID!;
@@ -17,24 +17,23 @@ async function run() {
   const buildNumber = parseInt(process.env.BUILD_NUMBER!);
   const buildUrl = `https://codemagic.io/app/${projectId}/build/${buildId}`;
 
-  if (process.env.CM_ARTIFACT_LINKS === undefined) {
-    console.error(
-      "To ensure correct execution the environment variable CM_ARTIFACT_LINKS must be present in the system"
-    );
-    process.exit(1);
-  }
-
   let artifactUrl: string;
   let artifactType: string;
 
-  const cmArtifactLinks: CmArtifactLink[] = JSON.parse(process.env.CM_ARTIFACT_LINKS!).filter(
-    (element: any) => element.type === "apk" || element.type === "ipa"
-  );
-  if (cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa").length !== 0) {
-    const pickedElement = cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa")[0];
-    artifactUrl = pickedElement.url;
-    artifactType = pickedElement.type;
-  } else {
+  if (process.env.CM_ARTIFACT_LINKS !== undefined) {
+    const cmArtifactLinks = JSON.parse(process.env.CM_ARTIFACT_LINKS);
+    if (cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa").length === 0) {
+      buildWasSuccessful = false;
+    } else {
+      const pickedElement = cmArtifactLinks.filter(
+        (element: any) => element.type === "apk" || element.type === "ipa"
+      )[0];
+      artifactUrl = pickedElement.url;
+      artifactType = pickedElement.type;
+    }
+  }
+
+  if (!buildWasSuccessful) {
     // should link to the workflow-log can be determined from buildId and projectId
     artifactUrl = buildUrl;
     artifactType = "logs";
@@ -80,14 +79,18 @@ async function run() {
       () => {
         return;
       },
-      async (args) =>
+      async (args) => {
+        checkArtifactLinkMatchesPlatform(args, artifactType);
+
         await runTeamsProductionMessagingCommand({
           projectName: args.projectName,
           platform: args.platform,
           buildUrl,
           buildNumber,
-          webhook
-        })
+          webhook,
+          successfulBuild: buildWasSuccessful
+        });
+      }
     )
     .demandCommand(1, "Must provide a valid command from the ones listed above.")
     .scriptName("jscm")

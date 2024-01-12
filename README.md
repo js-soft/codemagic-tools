@@ -46,10 +46,10 @@ After preparation of your local environment the script will execute the jscm com
 
 It will execute both possible command:
 
-- teams-develop (in failed/successful state)
-- teams-production (in failed/successful state)
+- teams-develop (in failed/successful state/without artifacts)
+- teams-production (in failed/successful state/without artifacts)
 
-&rarr; This will result in 4 messages being sent to the specified teams channel
+&rarr; This will result in 6(4 failed/2 successful) messages being sent to the specified teams channel.
 
 ### Calling the test script
 
