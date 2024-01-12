@@ -9,7 +9,7 @@ import { runTeamsDevelopMessagingCommand } from "./commands/TeamsDevelopMessagin
 import { runTeamsProductionMessagingCommand } from "./commands/TeamsProductionMessaging";
 
 async function run() {
-  let buildWasSuccessful = fs.existsSync(`${os.homedir()}/SUCCESS`);
+  const buildWasSuccessful = fs.existsSync(`${os.homedir()}/SUCCESS`);
 
   const webhook = process.env.teams_webhook_url!;
   const buildId = process.env.CM_BUILD_ID!;
@@ -20,23 +20,19 @@ async function run() {
   let artifactUrl: string;
   let artifactType: string;
 
+  // if no artifact is found, logs are used as a fallback
+  artifactUrl = buildUrl;
+  artifactType = "logs";
+
   if (process.env.CM_ARTIFACT_LINKS !== undefined) {
     const cmArtifactLinks = JSON.parse(process.env.CM_ARTIFACT_LINKS);
-    if (cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa").length === 0) {
-      buildWasSuccessful = false;
-    } else {
+    if (cmArtifactLinks.filter((element: any) => element.type === "apk" || element.type === "ipa").length !== 0) {
       const pickedElement = cmArtifactLinks.filter(
         (element: any) => element.type === "apk" || element.type === "ipa"
       )[0];
       artifactUrl = pickedElement.url;
       artifactType = pickedElement.type;
     }
-  }
-
-  if (!buildWasSuccessful) {
-    // should link to the workflow-log can be determined from buildId and projectId
-    artifactUrl = buildUrl;
-    artifactType = "logs";
   }
 
   await yargs(process.argv.slice(2))
