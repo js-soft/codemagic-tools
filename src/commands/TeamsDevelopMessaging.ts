@@ -42,16 +42,12 @@ export async function runTeamsDevelopMessagingCommand(options: TeamsDevelopMessa
         name: options.buildWasSuccessful ? `Download ${options.platform}-App` : "Download Flutter Logs",
         targets: [{ os: "default", uri: options.artifactUrl }]
       },
-      {
-        "@type": "OpenUri",
-        name: "Open Build",
-        targets: [{ os: "default", uri: options.buildUrl }]
-      }
+      { "@type": "OpenUri", name: "Open Build", targets: [{ os: "default", uri: options.buildUrl }] }
     ]
   };
 
-  await axios.post(options.webhook, messageContents).catch((_) => {
-    console.log("Could not send message to teams channel.");
+  await axios.post(options.webhook, messageContents).catch((e) => {
+    console.log("Could not send message to teams channel.", e);
     process.exit(1);
   });
 }

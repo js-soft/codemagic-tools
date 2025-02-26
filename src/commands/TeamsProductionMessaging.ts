@@ -42,8 +42,8 @@ export async function runTeamsProductionMessagingCommand(options: TeamsProductio
     ]
   };
 
-  await axios.post(options.webhook, messageContents).catch((_) => {
-    console.log("Could not send message to teams channel.");
+  await axios.post(options.webhook, messageContents).catch((e) => {
+    console.log("Could not send message to teams channel.", e);
     process.exit(1);
   });
 }
